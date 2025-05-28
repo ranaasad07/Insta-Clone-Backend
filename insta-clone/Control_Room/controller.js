@@ -2,21 +2,43 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../Database_Modal/modals');
 
-const SignUp = async (req, res) => {
-  const { username, fullname, email, password } = req.body;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
+const SignUp = async (req, res) => {
+  const { username, fullName, email, password } = req.body;
+
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+<<<<<<< HEAD
     const user = await User.create({ username, fullName: fullname, email, password: hashedPassword });
     user.save();
+=======
+>>>>>>> dd4150968da6a3ff93837e7f0145c582cd7044fe
 
+    // Create and save user
+    const user = new User({
+      username,
+      fullName,
+      email,
+      password: hashedPassword,
+    });
+
+    await user.save();
+    console.log("user", user)
     res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
+    console.error('Signup Error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
 
 const Login = async (req, res) => {
   const { email, password } = req.body;
