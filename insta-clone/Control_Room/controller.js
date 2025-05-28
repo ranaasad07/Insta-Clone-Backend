@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../Database_Modal/modals');
 
-
 const SignUp = async (req, res) => {
   const { username, fullName, email, password } = req.body;
 
@@ -15,11 +14,6 @@ const SignUp = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-<<<<<<< HEAD
-    const user = await User.create({ username, fullName: fullname, email, password: hashedPassword });
-    user.save();
-=======
->>>>>>> dd4150968da6a3ff93837e7f0145c582cd7044fe
 
     // Create and save user
     const user = new User({
@@ -30,15 +24,13 @@ const SignUp = async (req, res) => {
     });
 
     await user.save();
-    console.log("user", user)
+    console.log("user", user);
     res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
     console.error('Signup Error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
 
 const Login = async (req, res) => {
   const { email, password } = req.body;
@@ -52,12 +44,11 @@ const Login = async (req, res) => {
     const payload = {
       id: user._id,
       email: user.email,
-      fullname: user.fullname,
+      fullName: user.fullName,
       username: user.username,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
 
     res.json({ token });
   } catch (err) {
@@ -66,4 +57,4 @@ const Login = async (req, res) => {
   }
 };
 
-module.exports = { SignUp, Login }
+module.exports = { SignUp, Login };
