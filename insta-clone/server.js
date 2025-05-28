@@ -9,9 +9,11 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/instagram/',router)
-connectDB(process.env.MONGODB_URI);
-
+app.use('/instagram',router) 
+connectDB(process.env.MONGODB_URI)
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.listen(PORT, () => {
+   console.log(`Server running at port ${PORT}`);
+});
