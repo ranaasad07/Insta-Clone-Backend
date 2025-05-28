@@ -2,14 +2,14 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./Mongo_Connection/connectdb');
-const router = require('./Routes/route');
+const router = require('./Routes/route.js');
 
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/instagram/',router)
+app.use('/instagram',router)
 connectDB(process.env.MONGODB_URI);
 
 
