@@ -132,4 +132,4 @@ const Login = async (req, res) => {
   }
 };
 
-module.exports = { SignUp, Login,emailVerification ,userVerification};
+module.exports = { SignUp, Login,emailVerification ,userVerification,updatePassword};
