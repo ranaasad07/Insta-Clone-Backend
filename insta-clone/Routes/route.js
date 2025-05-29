@@ -5,8 +5,8 @@ const router = express.Router();
 router.post("/SignUp", SignUp);
 router.post("/login", Login);
 router.post('/verifyemail',emailVerification)
-router.post('forgetpassword',userVerification)
-router.post('updatepassword',updatePassword)
+router.post('/forgetpassword',userVerification)
+router.post('/updatepassword',updatePassword)
 
 
 module.exports = router;
