@@ -19,6 +19,14 @@ const userSchema = new Schema({
     fullName: {
         type: String,
         required: true
+    },
+    Otp :{
+        type:String,
+        
+    },
+    isEmailVerified : {
+        type: Boolean,
+        default:false,
     }
 }, { timestamps: true });
 
