@@ -61,6 +61,51 @@ const emailVerification = async (req, res) => {
   }
 }
 
+const userVerification  = async(req,res)=>{
+  const {email} = req.body;
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const Otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+
+    const user = new User({
+      Otp,
+      isEmailVerified: false
+    });
+
+    await user.save();
+
+    await sendEmail(email, 'Verify your email', `Your OTP is: ${Otp}`);
+
+    res.status(201).json({ message: 'otp sent successfully' });
+  } catch (err) {
+    console.error('otp Error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+const updatePassword = async (req, res) => {
+  const { password, email } = req.body;
+  try {
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    existingUser.password = hashedPassword;
+    await existingUser.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('Error updating password:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 const Login = async (req, res) => {
   const { email, password } = req.body;
@@ -87,4 +132,4 @@ const Login = async (req, res) => {
   }
 };
 
-module.exports = { SignUp, Login,emailVerification };
+module.exports = { SignUp, Login,emailVerification ,userVerification};
