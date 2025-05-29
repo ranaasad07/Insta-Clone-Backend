@@ -47,7 +47,7 @@ const emailVerification = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    if (findUser.Otp === otp) {
+    if (findUser.Otp == otp) {
       findUser.isEmailVerified = true;
       findUser.Otp = '';
       await findUser.save();
