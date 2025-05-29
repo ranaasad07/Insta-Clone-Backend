@@ -4,17 +4,17 @@ const sendEmail = require('../Email_sending_file/sendEmail');
 const { User } = require('../Database_Modal/modals');
 
 const SignUp = async (req, res) => {
-  const { username, fullName, email, password, Otp } = req.body;
+  const { username, fullName, email, password } = req.body;
 
   try {
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    console.log(Otp)
-    // Hash password
+    const Otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+    console.log("Generated OTP:", Otp);
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -22,12 +22,15 @@ const SignUp = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
-      Otp
+      Otp,
+      isEmailVerified: false
     });
 
     await user.save();
-    console.log("user", user);
-    res.status(201).json({ message: 'User created successfully' });
+
+    await sendEmail(email, 'Verify your email', `Your OTP is: ${Otp}`);
+
+    res.status(201).json({ message: 'User created successfully. Please verify your email.' });
   } catch (err) {
     console.error('Signup Error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -35,7 +38,7 @@ const SignUp = async (req, res) => {
 };
 
 const emailVerification = async (req, res) => {
-  const { email, otp } = req.body;
+  const { email ,otp} = req.body;
   console.log(email,otp);
   try {
     const findUser = await User.findOne({ email });
