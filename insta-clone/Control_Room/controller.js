@@ -38,8 +38,8 @@ const SignUp = async (req, res) => {
 };
 
 const emailVerification = async (req, res) => {
-  const { email ,otp} = req.body;
-  console.log(email,otp);
+  const { email, otp } = req.body;
+  console.log(email, otp);
   try {
     const findUser = await User.findOne({ email });
 
@@ -61,27 +61,27 @@ const emailVerification = async (req, res) => {
   }
 }
 
-const userVerification  = async(req,res)=>{
-  const {email} = req.body;
+const userVerification = async (req, res) => {
+  const { email } = req.body;
   console.log(email)
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-    //   return res.status(400).json({ message: 'User already exists' });
+      //   return res.status(400).json({ message: 'User already exists' });
 
-    const Otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const Otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    existingUser.Otp = Otp
-    existingUser.isEmailVerified = false
-    // const user = new User({
-    //   Otp,
-    //   isEmailVerified: false
-    // });
+      existingUser.Otp = Otp
+      existingUser.isEmailVerified = false
+      // const user = new User({
+      //   Otp,
+      //   isEmailVerified: false
+      // });
 
-    // await user.save();
-    existingUser.save()
+      // await user.save();
+      existingUser.save()
 
-    await sendEmail(email, 'Verify your email', `Your OTP is: ${Otp}`);
+      await sendEmail(email, 'Verify your email', `Your OTP is: ${Otp}`);
     }
 
 
@@ -104,7 +104,9 @@ const updatePassword = async (req, res) => {
     existingUser.password = hashedPassword;
     await existingUser.save();
 
-    res.status(200).json({ message: 'Password updated successfully' });
+    setTimeout(() => {
+      res.status(200).json({ message: 'Password updated successfully' });
+    }, 2000);
   } catch (err) {
     console.error('Error updating password:', err);
     res.status(500).json({ message: 'Server error' });
@@ -136,4 +138,4 @@ const Login = async (req, res) => {
   }
 };
 
-module.exports = { SignUp, Login,emailVerification ,userVerification,updatePassword};
+module.exports = { SignUp, Login, emailVerification, userVerification, updatePassword };
