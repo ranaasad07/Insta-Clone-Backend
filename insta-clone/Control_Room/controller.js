@@ -30,7 +30,7 @@ const SignUp = async (req, res) => {
 
     await sendEmail(email, 'Verify your email', `Your OTP is: ${Otp}`);
 
-    res.status(201).json({ message: 'User created successfully. Please verify your email.' });
+    res.status(201).json({ message: 'User created successfully. Please verify your email.'});
   } catch (err) {
     console.error('Signup Error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -138,4 +138,25 @@ const Login = async (req, res) => {
   }
 };
 
-module.exports = { SignUp, Login, emailVerification, userVerification, updatePassword };
+const getUsernames = async (req, res) => {
+  try {
+    const { mail } = req.params;
+
+    const findUser = await User.findOne({ email: mail }); // ✅ Correct query
+
+    if (!findUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      username: findUser.username,
+      fullName: findUser.fullName,
+    });
+
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { SignUp, Login, emailVerification, userVerification, updatePassword ,getUsernames};
