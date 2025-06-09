@@ -30,7 +30,7 @@ const SignUp = async (req, res) => {
 
     await sendEmail(email, 'Verify your email', `Your OTP is: ${Otp}`);
 
-    res.status(201).json({ message: 'User created successfully. Please verify your email.'});
+    res.status(201).json({ message: 'User created successfully. Please verify your email.' });
   } catch (err) {
     console.error('Signup Error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -147,11 +147,15 @@ const getUsernames = async (req, res) => {
     if (!findUser) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     res.status(200).json({
       username: findUser.username,
       fullName: findUser.fullName,
+      profilePic: findUser.profilePicture,
+      gender:findUser.gender,
+      bio:findUser.bio,
+      showSuggestions:findUser.showSuggestions
     });
+
 
   } catch (err) {
     console.error('Error fetching user:', err);
@@ -159,4 +163,61 @@ const getUsernames = async (req, res) => {
   }
 };
 
-module.exports = { SignUp, Login, emailVerification, userVerification, updatePassword ,getUsernames};
+const changeProfilePic = async (req, res) => {
+  try {
+    const { email, profilePicture } = req.body;
+
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { profilePicture: profilePicture },
+      { new: true }
+    );
+
+    if (updatedUser) {
+      return res.status(200).json({ message: 'Profile picture changed', user: updatedUser });
+    } else {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+  } catch (err) {
+    console.error('Error updating profile picture:', err);
+    return res.status(500).json({ message: 'Could not change profile picture' });
+  }
+};
+
+const userEditing = async (req, res) => {
+  try {
+    const { email, bio, gender, showSuggestions } = req.body;
+
+    const updateBio = await User.findOneAndUpdate(
+      { email }, // filter by email
+      {
+        bio,
+        gender,
+        showSuggestions,
+      },
+      { new: true }
+    );
+
+    if (updateBio) {
+      res.status(200).json(updateBio);
+    } else {
+      res.status(404).json({ message: 'User not found or update failed' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error updating bio', error: err.message });
+  }
+};
+
+
+module.exports = {
+  SignUp,
+  Login,
+  emailVerification,
+  userVerification,
+  updatePassword,
+  getUsernames,
+  changeProfilePic,
+  userEditing
+};
