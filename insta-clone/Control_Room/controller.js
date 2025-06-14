@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../Email_sending_file/sendEmail');
-const { User } = require('../Database_Modal/modals');
+const { User, Post } = require('../Database_Modal/modals');
 
 const SignUp = async (req, res) => {
   const { username, fullName, email, password } = req.body;
@@ -151,9 +151,9 @@ const getUsernames = async (req, res) => {
       username: findUser.username,
       fullName: findUser.fullName,
       profilePic: findUser.profilePicture,
-      gender:findUser.gender,
-      bio:findUser.bio,
-      showSuggestions:findUser.showSuggestions
+      gender: findUser.gender,
+      bio: findUser.bio,
+      showSuggestions: findUser.showSuggestions
     });
 
 
@@ -210,6 +210,68 @@ const userEditing = async (req, res) => {
   }
 };
 
+const getUserprofileAndNameforPost = async (req, res) => {
+  try {
+    const { mail } = req.params;
+
+    const findUser = await User.findOne({ email: mail }); // ✅ Correct query
+
+    if (!findUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({
+      id: findUser._id,
+      username: findUser.username,
+      fullName: findUser.fullName,
+      profilePic: findUser.profilePicture,
+      gender: findUser.gender,
+      bio: findUser.bio,
+      showSuggestions: findUser.showSuggestions
+    });
+
+
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+const uploadingPost = async (req, res) => {
+  try {
+    const { userId, mediaUrl, caption, mediaType } = req.body;
+
+    const newPost = await Post.create({
+      userId,
+      mediaUrl,
+      caption,
+      mediaType,
+    });
+
+    await User.findByIdAndUpdate(userId, {
+      $push: { posts: newPost._id }
+    });
+
+    res.status(200).json({ message: 'Post uploaded successfully', post: newPost });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(400).json({ message: 'Could not upload post' });
+  }
+};
+
+const fetchAllPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({})
+      .sort({ createdAt: -1 })
+      .populate('userId', 'username profilePicture');
+
+    res.status(200).json({ Posts: posts });
+  } catch (err) {
+    console.error('Error fetching posts:', err);
+    res.status(500).json({ message: 'Error fetching posts' }); 
+  }
+};
+
+
 
 module.exports = {
   SignUp,
@@ -219,5 +281,8 @@ module.exports = {
   updatePassword,
   getUsernames,
   changeProfilePic,
-  userEditing
+  userEditing,
+  getUserprofileAndNameforPost,
+  uploadingPost,
+  fetchAllPosts,
 };
